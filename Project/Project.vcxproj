@@ -20,20 +20,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\BillBoard.cpp" />
+    <ClCompile Include="src\DrivingSimulation.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ObjModel.cpp" />
     <ClCompile Include="src\PPMImage.cpp" />
+    <ClCompile Include="src\Simulation.cpp" />
     <ClCompile Include="src\TrafficLight.cpp" />
     <ClCompile Include="src\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\BillBoard.h" />
     <ClInclude Include="src\BoundingBox.h" />
+    <ClInclude Include="src\DrivingSimulation.h" />
     <ClInclude Include="src\Face.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Normal.h" />
     <ClInclude Include="src\ObjModel.h" />
     <ClInclude Include="src\PPMImage.h" />
+    <ClInclude Include="src\Simulation.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\TrafficLight.h" />
     <ClInclude Include="src\utility.h" />

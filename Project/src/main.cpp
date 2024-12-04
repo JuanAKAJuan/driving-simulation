@@ -22,6 +22,7 @@
 #include "TrafficLight.h"
 #include "utility.h"
 #include "Billboard.h"
+#include "PPMImage.h"
 
 using namespace std;
 
@@ -98,9 +99,9 @@ ObjModel surveillanceCamera;
 TrafficLight trafficLight;
 
 /**
-* The texture-mapped billboard object.
+* The texture-mapped billboard objects.
 */
-Billboard billboard;
+Billboard billboard1, billboard2;
 
 /**
  * Current rotation angle of the car in degrees.
@@ -382,6 +383,11 @@ bool isValidTreePosition(float x, float z);
 void drawTrees();
 
 /**
+* Create a screenshot and save it as a PPM file.
+*/
+void saveSnapshot();
+
+/**
  * Window reshape callback.
  * Updates viewport dimensions and maintains aspect ratio.
  *
@@ -462,7 +468,8 @@ void drawScene()
     // Draw terrain
     glCallList(terrainID);
 
-    billboard.Draw();
+    billboard1.Draw();
+    billboard2.Draw();
 
     drawTrees();
 
@@ -770,10 +777,10 @@ void display()
     /*************************************************
      * Main View (Third Person Camera)
      *************************************************/
-    glViewport(0, 0, winWidth, winHeight - sHeight - 50);
+    glViewport(0, 0, winWidth, winHeight - sHeight);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45, (float)winWidth / (winHeight - sHeight - 50), 1, 1000);
+    gluPerspective(45, (float)winWidth / (winHeight - sHeight), 1, 1000);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -900,6 +907,11 @@ void keyboard(unsigned char key, int x, int y)
         carSpeed = 0;
         isMovingForward = false;
         isMovingBackward = false;
+        break;
+    case 's':
+    case 'S':
+        saveSnapshot();
+        cout << "Screenshot saved as snapshot.ppm" << endl;
         break;
     case 27:
         exit(0);
@@ -1159,6 +1171,27 @@ void timer(int miliseconds)
     glutPostRedisplay();
 }
 
+void saveSnapshot() {
+    // Get window dimensions
+    int totalBytes = winWidth * winHeight * 3;
+    unsigned char* pixels = new unsigned char[totalBytes];
+
+    // Read pixels from framebuffer
+    glReadBuffer(GL_FRONT);
+    glReadPixels(0, 0, winWidth, winHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    // Create and setup PPM image
+    PPMImage screenshot;
+    screenshot.AllocateMemory(winWidth, winHeight);
+    memcpy(screenshot.image, pixels, totalBytes);
+
+    // Image has to be flipped since OpenGL and PPM have different origins
+    screenshot.VerticalFlip();
+    screenshot.WriteFile("Screenshots/snapshot.ppm", "P6");
+
+    delete[] pixels;
+}
+
 /**
  * Main entry point for the traffic simulation.
  * Initializes GLUT, loads 3D models, and starts the main event loop.
@@ -1181,10 +1214,15 @@ int main(int argc, char** argv)
     car.ReadFile("Models/taxi.obj");
     surveillanceCamera.ReadFile("Models/camera.obj");
 
-    billboard.ReadFile("Models/taxi/plates_us1.ppm");
-    billboard.SetSize(20.0f, 10.0f);
-    billboard.SetLocation({50.0f, 15.0f, 50.0f});
-    billboard.SetOrientation(45.0f);
+    billboard1.ReadFile("Models/billboards/coke_ad.ppm");
+    billboard1.SetSize(20.0f, 8.0f);
+    billboard1.SetLocation({-50.0f, 10.0f, -50.0f});
+    billboard1.SetOrientation(45.0f);
+
+    billboard2.ReadFile("Models/billboards/whopper_ad.ppm");
+    billboard2.SetSize(20.0f, 8.0f);
+    billboard2.SetLocation({50.0f, 10.0f, -50.0f});
+    billboard2.SetOrientation(-45.0f);
 
     init();
     glutDisplayFunc(display);
